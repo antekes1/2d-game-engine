@@ -23,17 +23,23 @@ public class Player extends Entity{
     private String directionAnimation = "idle_up";
     String previousDirectionAnimation = "";
 
+    public final int screenX;
+    public final int screenY;
+
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
+
+        screenX = gp.screenWidth/2 - (gp.tileSize/2);
+        screenY = gp.screenHeight/2 - (gp.tileSize/2);
 
         getPlayerImgae();
         setDefaultValues();
     }
 
-    public void setDefaultValues() {
-        x = gp.screenWidth/2 - gp.tileSize/2;
-        y = gp.screenHeight/2 - gp.tileSize/2;
+    public void setDefaultValues() {;
+        worldX = gp.tileSize * 23;
+        worldY = gp.tileSize * 23;
         speed = 4;
         direction = "down";
     }
@@ -74,16 +80,16 @@ public class Player extends Entity{
         if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             if (keyH.leftPressed) {
                 direction = "left";
-                x -= speed;
+                worldX -= speed;
             } else if (keyH.rightPressed) {
                 direction = "right";
-                x += speed;
+                worldX += speed;
             } else if (keyH.upPressed) {
                 direction = "up";
-                y -= speed;
+                worldY -= speed;
             } else if (keyH.downPressed) {
                 direction = "down";
-                y += speed;
+                worldY += speed;
             }
             directionAnimation = direction;
         } else {
@@ -117,7 +123,7 @@ public class Player extends Entity{
 
         BufferedImage image = null;
         image = animations.get(directionAnimation)[spriteNum];
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
 
     }
 

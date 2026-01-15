@@ -33,10 +33,16 @@ public class GamePanel extends JPanel implements Runnable {
         tilesList.put("rock_on_grass.png", "rock_on_grass");
     }
 
+    // WORLD SETTINGS
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
+    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldHeight = tileSize * maxWorldCol;
+
     TileManager tileM = new TileManager(this, tilesList, "maps");
     KeyHandler keyH = new KeyHandler(movementKeys);
     Thread gameThread;
-    Player player = new Player(this, keyH);
+    public Player player = new Player(this, keyH);
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
