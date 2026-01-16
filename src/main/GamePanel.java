@@ -1,6 +1,8 @@
 package main;
 
+import entity.CollisionChecker;
 import entity.Player;
+import tile.TileData;
 import tile.TileManager;
 
 import javax.swing.*;
@@ -9,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class GamePanel extends JPanel implements Runnable {
     /// Settings for game engine
@@ -16,6 +19,7 @@ public class GamePanel extends JPanel implements Runnable {
     final int scale = 3;
     final int FPS = 60;
     ////////////////////
+    public boolean debugView=false;
 
     final public int tileSize = BaseTileSize * scale;
     final public int maxScreenCol = 24 ;
@@ -26,21 +30,23 @@ public class GamePanel extends JPanel implements Runnable {
             Arrays.asList(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D)
     );
 
-    private HashMap<String, String> tilesList = new HashMap<String, String>();
+    private LinkedHashMap<String, TileData> tilesList = new LinkedHashMap<String, TileData>();
     {
-        tilesList.put("grass_dark.png", "grass_dark");
-        tilesList.put("grass_dry.png", "grass_dry");
-        tilesList.put("rock_on_grass.png", "rock_on_grass");
+        tilesList.put("grass_texture.png", new TileData("grass_dark", 0, false));
+        tilesList.put("grass_dry.png", new TileData("grass_dry", 1, false));
+        tilesList.put("rock_on_grass.png", new TileData("rock_on_grass", 2, true));
+        tilesList.put("tree_texture_grass.png", new TileData("rock_on_grass", 3, true));
     }
 
     // WORLD SETTINGS
-    public final int maxWorldCol = 50;
-    public final int maxWorldRow = 50;
-    public final int worldWidth = tileSize * maxWorldCol;
-    public final int worldHeight = tileSize * maxWorldCol;
+    public int maxWorldCol = 50;
+    public int maxWorldRow = 50;
+    public int worldWidth = tileSize * maxWorldCol;
+    public int worldHeight = tileSize * maxWorldRow;
 
-    TileManager tileM = new TileManager(this, tilesList, "maps");
-    KeyHandler keyH = new KeyHandler(movementKeys);
+    public CollisionChecker cChecker = new CollisionChecker(this);
+    public TileManager tileM = new TileManager(this, tilesList, "maps");
+    KeyHandler keyH = new KeyHandler(this, movementKeys);
     Thread gameThread;
     public Player player = new Player(this, keyH);
 

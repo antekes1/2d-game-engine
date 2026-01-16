@@ -23,8 +23,8 @@ public class Player extends Entity{
     private String directionAnimation = "idle_up";
     String previousDirectionAnimation = "";
 
-    public final int screenX;
-    public final int screenY;
+    public int screenX;
+    public int screenY;
 
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -32,6 +32,9 @@ public class Player extends Entity{
 
         screenX = gp.screenWidth/2 - (gp.tileSize/2);
         screenY = gp.screenHeight/2 - (gp.tileSize/2);
+
+        solidArea = new Rectangle(10,16, 26, 30);
+        solidArea.x = (gp.tileSize - solidArea.width) / 2;
 
         getPlayerImgae();
         setDefaultValues();
@@ -76,41 +79,89 @@ public class Player extends Entity{
         }
     }
 
+    // W pliku Player.java
+
     public void update() {
-        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+        // 1. Obsługa klawiszy (Ruch po świecie)
+        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             if (keyH.leftPressed) {
                 direction = "left";
-                worldX -= speed;
             } else if (keyH.rightPressed) {
                 direction = "right";
-                worldX += speed;
             } else if (keyH.upPressed) {
                 direction = "up";
-                worldY -= speed;
             } else if (keyH.downPressed) {
                 direction = "down";
-                worldY += speed;
             }
+
             directionAnimation = direction;
+            isMoving = true;
+
+            collisionOn = false;
+            gp.cChecker.checkTile(this);
+
+            if(!collisionOn) {
+                switch (direction){
+                    case "up":
+                        worldY -= speed;break;
+                    case "down":
+                        worldY += speed;break;
+                    case "left":
+                        worldX -= speed;break;
+                    case "right":
+                        worldX += speed;break;
+                }
+            }
         } else {
             isMoving = false;
             directionAnimation = "idle_" + direction;
         }
-            if (!directionAnimation.equals(previousDirectionAnimation)) {
-                spriteNum = 0;
-            }
-            previousDirectionAnimation = directionAnimation;
 
-            spriteCounter++;
-            if(spriteCounter > 10) {
-                spriteNum++;
+
+
+        // 2. Obsługa animacji
+        if (!directionAnimation.equals(previousDirectionAnimation)) {
+            spriteNum = 0;
+        }
+        previousDirectionAnimation = directionAnimation;
+
+        spriteCounter++;
+        if (spriteCounter > 10) {
+            spriteNum++;
+            if (animations.get(directionAnimation) != null) {
                 int maxFrames = animations.get(directionAnimation).length;
-                if(spriteNum >= maxFrames) {
+                if (spriteNum >= maxFrames) {
                     spriteNum = 0;
                 }
-                spriteCounter = 0;
             }
+            spriteCounter = 0;
+        }
 
+        // 3. LOGIKA KAMERY
+        int screenCenterX = gp.screenWidth / 2 - (gp.tileSize / 2);
+        int screenCenterY = gp.screenHeight / 2 - (gp.tileSize / 2);
+
+        // --- Oś X ---
+        if (worldX < screenCenterX) {
+            screenX = worldX;
+        }
+        else if (worldX > gp.worldWidth - screenCenterX - gp.tileSize) {
+            screenX = gp.screenWidth - (gp.worldWidth - worldX);
+        }
+        else {
+            screenX = screenCenterX;
+        }
+
+        // --- Oś Y ---
+        if (worldY < screenCenterY) {
+            screenY = worldY;
+        }
+        else if (worldY > gp.worldHeight - screenCenterY - gp.tileSize) {
+            screenY = gp.screenHeight - (gp.worldHeight - worldY);
+        }
+        else {
+            screenY = screenCenterY;
+        }
     }
 
     public void draw(Graphics2D g2) {
@@ -124,6 +175,23 @@ public class Player extends Entity{
         BufferedImage image = null;
         image = animations.get(directionAnimation)[spriteNum];
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+
+        if(gp.debugView) {
+            g2.setColor(new Color(255, 0, 0, 100)); // semi-transparent red
+            g2.fillRect(
+                    screenX + solidArea.x,
+                    screenY + solidArea.y,
+                    solidArea.width,
+                    solidArea.height
+            );
+            g2.setColor(Color.RED); // optional: outline
+            g2.drawRect(
+                    screenX + solidArea.x,
+                    screenY + solidArea.y,
+                    solidArea.width,
+                    solidArea.height
+            );
+        }
 
     }
 
