@@ -2,6 +2,8 @@ package main;
 
 import entity.CollisionChecker;
 import entity.Player;
+import object.AssetSetter;
+import object.SuperObject;
 import tile.TileData;
 import tile.TileManager;
 
@@ -10,7 +12,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -32,10 +33,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     private LinkedHashMap<String, TileData> tilesList = new LinkedHashMap<String, TileData>();
     {
-        tilesList.put("grass_texture.png", new TileData("grass_dark", 0, false));
+        tilesList.put("grass_texture.png", new TileData("grass_texture", 0, false));
         tilesList.put("grass_dry.png", new TileData("grass_dry", 1, false));
         tilesList.put("rock_on_grass.png", new TileData("rock_on_grass", 2, true));
-        tilesList.put("tree_texture_grass.png", new TileData("rock_on_grass", 3, true));
+        tilesList.put("tree_texture_grass.png", new TileData("tree_texture_grass", 3, true));
+        tilesList.put("grass_light.png", new TileData("grass_light", 4, false));
+        tilesList.put("grass_dark.png", new TileData("grass_dark", 5, false));
+        tilesList.put("grass_dark_right.png", new TileData("grass_dark_right", 6, false));
     }
 
     // WORLD SETTINGS
@@ -45,10 +49,12 @@ public class GamePanel extends JPanel implements Runnable {
     public int worldHeight = tileSize * maxWorldRow;
 
     public CollisionChecker cChecker = new CollisionChecker(this);
+    public AssetSetter aSetter = new AssetSetter(this);
     public TileManager tileM = new TileManager(this, tilesList, "maps");
     KeyHandler keyH = new KeyHandler(this, movementKeys);
     Thread gameThread;
     public Player player = new Player(this, keyH);
+    public SuperObject obj[] = new SuperObject[10];
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -56,6 +62,10 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+    }
+
+    public void setupGame() {
+        aSetter.setObject();
     }
 
     public void startGameThread() {
@@ -101,6 +111,14 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
 
         tileM.draw(g2);
+
+        // objects
+        for (SuperObject superObject : obj) {
+            if (superObject != null) {
+                superObject.draw(g2, this);
+            }
+        }
+
         player.draw(g2);
 
         g2.dispose();
