@@ -35,6 +35,8 @@ public class Player extends Entity{
 
         solidArea = new Rectangle(10,16, 26, 30);
         solidArea.x = (gp.tileSize - solidArea.width) / 2;
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
 
         getPlayerImgae();
         setDefaultValues();
@@ -99,6 +101,11 @@ public class Player extends Entity{
 
             collisionOn = false;
             gp.cChecker.checkTile(this);
+
+            int objectIndex = gp.cChecker.checkObject(this, true);
+            if (objectIndex != 9999){
+                gp.obj[objectIndex].action();
+            }
 
             if(!collisionOn) {
                 switch (direction){
