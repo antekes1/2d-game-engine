@@ -54,7 +54,7 @@ engine.start();
 5. Open a Pull Request.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
-For any inquiries, please reach out to [Your Name](mailto:your.email@example.com).
+For any inquiries, please reach out to antekes1dev@gmail.com.
